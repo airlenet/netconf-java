@@ -1,6 +1,6 @@
 package com.airlenet.netconf.json;
 
-import com.airlenet.data.jpa.json.JpaModule;
+//import com.airlenet.data.jpa.json.JpaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

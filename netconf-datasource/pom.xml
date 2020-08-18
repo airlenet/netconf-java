@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>play-netconf</artifactId>
+        <artifactId>netconf-java</artifactId>
         <groupId>com.airlenet.netconf</groupId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
@@ -15,12 +15,12 @@
         <dependency>
             <groupId>com.airlenet.network</groupId>
             <artifactId>network-datasource</artifactId>
-            <version>1.2.0</version>
+            <version>${network.version}</version>
         </dependency>
         <dependency>
             <groupId>com.airlenet.yang</groupId>
             <artifactId>yang-jnc</artifactId>
-            <version>${play.yang.version}</version>
+            <version>${yang-java.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

@@ -1,0 +1,86 @@
+package com.airlenet.netconf.api;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.util.Optional;
+import java.util.Set;
+
+public final class NetconfHelloMessage extends NetconfMessage {
+//
+//    public static final String HELLO_TAG = "hello";
+//
+//    private final NetconfHelloMessageAdditionalHeader additionalHeader;
+//
+//    public NetconfHelloMessage(final Document doc, final NetconfHelloMessageAdditionalHeader additionalHeader) {
+//        super(doc);
+//        checkHelloMessage(doc);
+//        this.additionalHeader = additionalHeader;
+//    }
+//
+//    public NetconfHelloMessage(final Document doc) {
+//        this(doc, null);
+//    }
+//
+//    public Optional<NetconfHelloMessageAdditionalHeader> getAdditionalHeader() {
+//        return Optional.ofNullable(additionalHeader);
+//    }
+//
+//    private static void checkHelloMessage(final Document doc) {
+//        if (!isHelloMessage(doc)) {
+//            throw new IllegalArgumentException(String.format(
+//                    "Hello message invalid format, should contain %s tag from namespace %s, but is: %s", HELLO_TAG,
+//                    XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlUtil.toString(doc)));
+//        }
+//    }
+//
+//    public static NetconfHelloMessage createClientHello(final Iterable<String> capabilities,
+//                                                        final Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional) {
+//        return new NetconfHelloMessage(createHelloMessageDoc(capabilities), additionalHeaderOptional.orElse(null));
+//    }
+//
+//    private static Document createHelloMessageDoc(final Iterable<String> capabilities) {
+//        Document doc = UntrustedXML.newDocumentBuilder().newDocument();
+//        Element helloElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
+//                HELLO_TAG);
+//        Element capabilitiesElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
+//                XmlNetconfConstants.CAPABILITIES);
+//
+//        for (String capability : Sets.newHashSet(capabilities)) {
+//            Element capElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
+//                    XmlNetconfConstants.CAPABILITY);
+//            capElement.setTextContent(capability);
+//            capabilitiesElement.appendChild(capElement);
+//        }
+//
+//        helloElement.appendChild(capabilitiesElement);
+//
+//        doc.appendChild(helloElement);
+//        return doc;
+//    }
+//
+//    public static NetconfHelloMessage createServerHello(final Set<String> capabilities, final long sessionId) {
+//        Document doc = createHelloMessageDoc(capabilities);
+//        Element sessionIdElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
+//                XmlNetconfConstants.SESSION_ID);
+//        sessionIdElement.setTextContent(Long.toString(sessionId));
+//        doc.getDocumentElement().appendChild(sessionIdElement);
+//        return new NetconfHelloMessage(doc);
+//    }
+//
+//    public static boolean isHelloMessage(final NetconfMessage msg) {
+//        return isHelloMessage(msg.getDocument());
+//    }
+//
+//    private static boolean isHelloMessage(final Document document) {
+//        final XmlElement element = XmlElement.fromDomElement(document.getDocumentElement());
+//        if (!HELLO_TAG.equals(element.getName())) {
+//            return false;
+//        }
+//
+//        final Optional<String> optNamespace = element.getNamespaceOptionally();
+//        // accept even if hello has no namespace
+//        return !optNamespace.isPresent()
+//                || XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(optNamespace.get());
+//    }
+}

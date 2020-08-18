@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.airlenet.netconf</groupId>
-    <artifactId>play-netconf</artifactId>
+    <artifactId>netconf-java</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>netconf-spring</name>
-    <description>netconf-spring</description>
-    <url>https://github.com/airshiplay/netconf-spring</url>
+    <name>netconf-java</name>
+    <description>netconf-java</description>
+    <url>https://github.com/airlenet/netconf-java</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <encoding>UTF-8</encoding>
@@ -21,19 +21,20 @@
         <spring-boot.version>2.0.3.RELEASE</spring-boot.version>
         <spring-cloud.version>Finchley.SR2</spring-cloud.version>
         <querydsl.version>4.1.4</querydsl.version>
-        <play-boot.version>3.0.0-SNAPSHOT</play-boot.version>
-        <play.yang.version>2.0.0-SNAPSHOT</play.yang.version>
+        <yang-java.version>2.0.0-SNAPSHOT</yang-java.version>
+        <network.version>2.0.0-SNAPSHOT</network.version>
         <project.build.timestamp>${timestamp}</project.build.timestamp>
     </properties>
     <modules>
-        <!--<module>netconf-common</module>-->
-        <!--<module>yang-model</module>-->
-        <!--<module>netconf-service</module>-->
-        <!--<module>netconf-rest</module>-->
+        <module>yang-gen</module>
+        <module>netconf-service</module>
+        <module>netconf-rest</module>
         <module>netconf-datasource</module>
-        <module>network-datasource</module>
-        <!--<module>snmp-datasource</module>-->
         <module>netconf-spring-boot-starter</module>
+        <module>netconf-client</module>
+        <module>netconf-callhome</module>
+        <module>netconf-core</module>
+<!--        <module>network</module>-->
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -43,11 +44,6 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.airlenet</groupId>
-                <artifactId>play-boot-dependencies</artifactId>
-                <version>${play-boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -66,6 +62,20 @@
     </dependencies>
     <repositories>
         <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>libs-release</name>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+        <repository>
+            <snapshots />
+            <id>snapshots</id>
+            <name>libs-snapshot</name>
+            <url>https://repo.spring.io/libs-snapshot</url>
+        </repository>
+        <repository>
             <id>airlenet-releases</id>
             <name>Airlenet Releases</name>
             <url>https://airlenet.github.io/maven-release</url>
@@ -74,6 +84,22 @@
             </snapshots>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>plugins-release</name>
+            <url>https://repo.spring.io/plugins-release</url>
+        </pluginRepository>
+        <pluginRepository>
+            <snapshots />
+            <id>snapshots</id>
+            <name>plugins-snapshot</name>
+            <url>https://repo.spring.io/plugins-snapshot</url>
+        </pluginRepository>
+    </pluginRepositories>
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
@@ -82,9 +108,9 @@
     </licenses>
     <developers>
         <developer>
-            <id>airshiplay</id>
-            <name>airshiplay</name>
-            <email>airshiplay@126.com</email>
+            <id>airlenet</id>
+            <name>airlenet</name>
+            <email>airlenet@163.com</email>
         </developer>
     </developers>
     <organization>
@@ -93,12 +119,12 @@
     </organization>
     <scm>
         <connection>
-            scm:git:https://github.com/airshiplay/play-netconf.git
+            scm:git:https://github.com/airlenet/netconf-java.git
         </connection>
         <developerConnection>
-            https://github.com/airshiplay/play-netconf.git
+            https://github.com/airlenet/netconf-java.git
         </developerConnection>
-        <url>https://github.com/airshiplay/play-netconf</url>
+        <url>https://github.com/airlenet/netconf-java</url>
         <tag>HEAD</tag>
     </scm>
     <build>

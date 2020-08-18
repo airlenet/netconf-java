@@ -1,0 +1,179 @@
+package com.airlenet.netconf.callhome;
+
+import com.airlenet.netconf.DeviceSessionFactory;
+import  com.airlenet.netconf.callhome.CallHomeSessionContext.Factory;
+import org.apache.sshd.client.SshClient;
+import org.apache.sshd.client.future.AuthFuture;
+import org.apache.sshd.client.keyverifier.ServerKeyVerifier;
+import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.client.session.SessionFactory;
+import org.apache.sshd.common.future.SshFutureListener;
+import org.apache.sshd.common.io.IoAcceptor;
+import org.apache.sshd.common.io.IoServiceFactory;
+import org.apache.sshd.common.session.Session;
+import org.apache.sshd.common.session.SessionListener;
+import org.apache.sshd.netty.NettyIoServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.security.PublicKey;
+
+import static java.util.Objects.requireNonNull;
+
+public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeServer.class);
+
+    private final CallHomeAuthorizationProvider authProvider;
+    private final IoServiceFactory serviceFactory;
+    private final InetSocketAddress bindAddress;
+    private final StatusRecorder recorder;
+    private final CallHomeSessionContext.Factory sessionFactory;
+    private final IoAcceptor acceptor;
+    private final SshClient client;
+
+    NetconfCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
+                          final Factory factory, final InetSocketAddress socketAddress, final StatusRecorder recorder) {
+        this(sshClient, authProvider, factory, socketAddress, recorder,
+                new NettyIoServiceFactory(factory.getNettyGroup()));
+    }
+
+
+    NetconfCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
+                          final Factory factory, final InetSocketAddress socketAddress, final StatusRecorder recorder,
+                          final IoServiceFactory serviceFactory) {
+        this.client = requireNonNull(sshClient);
+        this.authProvider = requireNonNull(authProvider);
+        this.sessionFactory = requireNonNull(factory);
+        this.bindAddress = socketAddress;
+        this.recorder = recorder;
+        this.serviceFactory = requireNonNull(serviceFactory);
+
+        sshClient.setServerKeyVerifier(this);
+        sshClient.addSessionListener(createSessionListener());
+
+        acceptor = serviceFactory.createAcceptor(new DeviceSessionFactory(sshClient));
+    }
+
+
+    SshClient getClient() {
+        return client;
+    }
+
+    SessionListener createSessionListener() {
+        return new SessionListener() {
+            @Override
+            public void sessionEvent(final Session session, final Event event) {
+                ClientSession clientSession = (ClientSession) session;
+                LOG.debug("SSH session {} event {}", session, event);
+                switch (event) {
+                    case KeyEstablished:
+                        doAuth(clientSession);
+                        break;
+                    case Authenticated:
+                        CallHomeSessionContext.getFrom(clientSession).openNetconfChannel();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void sessionCreated(final Session session) {
+                LOG.debug("SSH session {} created", session);
+//                ((ClientSession)session);
+            }
+
+            @Override
+            public void sessionClosed(final Session session) {
+                CallHomeSessionContext ctx = CallHomeSessionContext.getFrom((ClientSession) session);
+                if (ctx != null) {
+                    ctx.removeSelf();
+                }
+                LOG.debug("SSH Session {} closed", session);
+            }
+
+            private void doAuth(final ClientSession session) {
+                try {
+                    final AuthFuture authFuture = CallHomeSessionContext.getFrom(session).authorize();
+                    authFuture.addListener(newAuthSshFutureListener(session));
+                } catch (IOException e) {
+                    LOG.error("Failed to authorize session {}", session, e);
+                }
+            }
+        };
+    }
+
+
+    private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession session) {
+        final PublicKey serverKey = session.getKex().getServerKey();
+
+        return new SshFutureListener<AuthFuture>() {
+            @Override
+            public void operationComplete(final AuthFuture authFuture) {
+                if (authFuture.isSuccess()) {
+                    onSuccess();
+                } else if (authFuture.isFailure()) {
+                    onFailure(authFuture.getException());
+                } else if (authFuture.isCanceled()) {
+                    onCanceled();
+                }
+                authFuture.removeListener(this);
+            }
+
+            private void onSuccess() {
+                LOG.debug("Authorize success");
+            }
+
+            private void onFailure(final Throwable throwable) {
+                LOG.error("Authorize failed for session {}", session, throwable);
+                recorder.reportFailedAuth(serverKey);
+                session.close(true);
+            }
+
+            private void onCanceled() {
+                LOG.warn("Authorize cancelled");
+                session.close(true);
+            }
+        };
+    }
+
+    @Override
+    public boolean verifyServerKey(final ClientSession sshClientSession, final SocketAddress remoteAddress,
+                                   final PublicKey serverKey) {
+        final CallHomeAuthorization authorization = authProvider.provideAuth(remoteAddress, serverKey);
+        // server is not authorized
+        if (!authorization.isServerAllowed()) {
+            LOG.info("Incoming session {} was rejected by Authorization Provider.", sshClientSession);
+            return false;
+        }
+        CallHomeSessionContext session = sessionFactory.createIfNotExists(
+                sshClientSession, authorization, remoteAddress);
+        // Session was created, session with same name does not exists
+        if (session != null) {
+            return true;
+        }
+        // Session was not created, session with same name exists
+        LOG.info("Incoming session {} was rejected. Session with same name {} is already active.",
+                sshClientSession, authorization.getSessionName());
+        return false;
+    }
+
+    public void bind() throws IOException {
+        try {
+            client.start();
+            acceptor.bind(bindAddress);
+        } catch (IOException e) {
+            LOG.error("Unable to start NETCONF CallHome Service on {}", bindAddress, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void close() {
+        acceptor.close(true);
+        serviceFactory.close(true);
+    }
+}

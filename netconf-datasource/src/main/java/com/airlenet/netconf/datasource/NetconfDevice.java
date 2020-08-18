@@ -20,8 +20,13 @@ public class NetconfDevice {
      */
     public NetconfDevice(String url, String username, String password) {
         this.url = url;
-        this.host = url.substring(10, url.lastIndexOf(":"));
-        this.port = Integer.parseInt(url.substring(url.lastIndexOf(":") + 1, url.length()));
+        try {
+            this.host = url.substring(10, url.lastIndexOf(":"));
+            this.port = Integer.parseInt(url.substring(url.lastIndexOf(":") + 1, url.length()));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("url format netconf://127.0.0.1:2022", e);
+        }
+
         this.username = username;
         this.password = password;
     }
