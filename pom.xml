@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.airlenet.netconf</groupId>
     <artifactId>play-netconf</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>netconf-spring</name>
     <description>netconf-spring</description>
@@ -22,7 +22,7 @@
         <spring-cloud.version>Finchley.SR2</spring-cloud.version>
         <querydsl.version>4.1.4</querydsl.version>
         <play-boot.version>3.0.0-SNAPSHOT</play-boot.version>
-        <play.yang.version>1.2.0</play.yang.version>
+        <play.yang.version>1.3.0-SNAPSHOT</play.yang.version>
         <project.build.timestamp>${timestamp}</project.build.timestamp>
     </properties>
     <modules>
@@ -44,11 +44,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>com.airlenet</groupId>
-                <artifactId>play-boot-dependencies</artifactId>
-                <version>${play-boot.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.airlenet</groupId>-->
+<!--                <artifactId>play-boot-dependencies</artifactId>-->
+<!--                <version>${play-boot.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
