@@ -2,13 +2,13 @@ package com.airlenet.netconf.datasource;
 
 import com.airlenet.netconf.datasource.util.StringUtils;
 import com.airlenet.netconf.datasource.util.Utils;
-import com.airlenet.network.NetworkDataSource;
+
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
-public abstract class NetconfAbstractDataSource implements NetworkDataSource {
+public abstract class NetconfAbstractDataSource {
     private static final Logger LOG = Logger.getLogger("NetconfAbstractDataSource");
     protected volatile String username;
     protected volatile String password;
@@ -91,4 +91,12 @@ public abstract class NetconfAbstractDataSource implements NetworkDataSource {
 
         return list;
     }
+
+    public abstract NetconfPooledConnection getConnection() throws NetconfException;
+
+    public abstract NetconfPooledConnection getConnection(String username, String password) throws NetconfException;
+
+    public abstract void close();
+
+    public abstract void restart();
 }

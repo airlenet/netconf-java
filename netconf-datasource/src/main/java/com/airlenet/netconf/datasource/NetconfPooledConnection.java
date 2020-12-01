@@ -1,14 +1,12 @@
 package com.airlenet.netconf.datasource;
 
 import com.airlenet.netconf.datasource.util.Utils;
-import com.airlenet.network.NetworkConnection;
-import com.airlenet.network.NetworkPooledConnection;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public class NetconfPooledConnection extends NetconfConnection implements NetworkPooledConnection, NetworkConnection, AutoCloseable {
+public class NetconfPooledConnection extends NetconfConnection implements AutoCloseable {
 
     public ReentrantLock lock = new ReentrantLock();
     protected final Thread ownerThread;
@@ -32,7 +30,7 @@ public class NetconfPooledConnection extends NetconfConnection implements Networ
         connectedTimeMillis = System.currentTimeMillis();
     }
 
-    public Thread getOwnerThread() {
+    protected Thread getOwnerThread() {
         return ownerThread;
     }
 
@@ -40,7 +38,7 @@ public class NetconfPooledConnection extends NetconfConnection implements Networ
         return connectedTimeMillis;
     }
 
-    @Override
+
     public NetconfConnection getConnection() throws NetconfException {
         return conn;
     }
@@ -86,7 +84,7 @@ public class NetconfPooledConnection extends NetconfConnection implements Networ
         close();
     }
 
-    public void discardConnection() throws NetconfException {
+    protected void discardConnection() throws NetconfException {
         conn.abandoned = true;
         close();
     }
@@ -251,13 +249,13 @@ public class NetconfPooledConnection extends NetconfConnection implements Networ
     }
 
     @Override
-    public void updateInputDataInteraction(String message, long inputCount, long inputTimeMillis) {
+    protected void updateInputDataInteraction(String message, long inputCount, long inputTimeMillis) {
         if (conn != null)
             conn.updateInputDataInteraction(message, inputCount, inputTimeMillis);
     }
 
     @Override
-    public void updateOutputDataInteraction(String message, long outputCount, long outputTimeMillis) {
+    protected void updateOutputDataInteraction(String message, long outputCount, long outputTimeMillis) {
         if (conn != null)
             conn.updateOutputDataInteraction(message, outputCount, outputTimeMillis);
     }
@@ -266,7 +264,7 @@ public class NetconfPooledConnection extends NetconfConnection implements Networ
         return runStackTrace;
     }
 
-    public void setRunStackTrace(String runStackTrace) {
+    protected void setRunStackTrace(String runStackTrace) {
         this.runStackTrace = runStackTrace;
     }
 
@@ -278,7 +276,7 @@ public class NetconfPooledConnection extends NetconfConnection implements Networ
         return connectStackTrace;
     }
 
-    public void setConnectStackTrace(StackTraceElement[] connectStackTrace) {
+    protected void setConnectStackTrace(StackTraceElement[] connectStackTrace) {
         this.connectStackTrace = connectStackTrace;
     }
 
@@ -286,13 +284,13 @@ public class NetconfPooledConnection extends NetconfConnection implements Networ
         return connectedTimeNano;
     }
 
-    public void setConnectedTimeNano() {
+    protected void setConnectedTimeNano() {
         if (connectedTimeNano <= 0) {
             this.setConnectedTimeNano(System.nanoTime());
         }
     }
 
-    public void setConnectedTimeNano(long connectedTimeNano) {
+    protected void setConnectedTimeNano(long connectedTimeNano) {
         this.connectedTimeNano = connectedTimeNano;
     }
 

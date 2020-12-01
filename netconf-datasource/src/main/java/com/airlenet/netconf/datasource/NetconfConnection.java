@@ -3,11 +3,9 @@ package com.airlenet.netconf.datasource;
 import com.airlenet.netconf.datasource.exception.NetconfJNCTimeOutException;
 import com.airlenet.netconf.datasource.exception.NetconfSessionMessageMismatchException;
 import com.airlenet.netconf.datasource.util.NetconfExceptionUtils;
-import com.airlenet.network.NetworkConnection;
-import com.airlenet.network.NetworkException;
 import com.tailf.jnc.*;
 
-public class NetconfConnection implements NetworkConnection {
+public class NetconfConnection {
 
     protected final NetconfSession netconfSession;
     private final long sessionId;
@@ -44,8 +42,8 @@ public class NetconfConnection implements NetworkConnection {
         this.jncSubscriber.setNetconfConnection(this);
     }
 
-    @Override
-    public void close() throws NetworkException {
+
+    public void close() throws NetconfException {
         try {
             netconfSession.closeSession();
         } catch (Exception e) {
@@ -65,7 +63,7 @@ public class NetconfConnection implements NetworkConnection {
         return inputTimeMillis;
     }
 
-    public void updateInputDataInteraction(String message, long inputCount, long inputTimeMillis) {
+    protected void updateInputDataInteraction(String message, long inputCount, long inputTimeMillis) {
         this.inputTimeMillis = inputTimeMillis;
         this.inputMessage = message;
         this.inputCount = inputCount;
@@ -74,7 +72,7 @@ public class NetconfConnection implements NetworkConnection {
         }
     }
 
-    public void setInputDataInteraction(String message, long inputCount, long inputTimeMillis) {
+    protected void setInputDataInteraction(String message, long inputCount, long inputTimeMillis) {
         this.inputTimeMillis = inputTimeMillis;
         this.inputMessage = message;
         this.inputCount = inputCount;
@@ -87,7 +85,7 @@ public class NetconfConnection implements NetworkConnection {
         return outputTimeMillis;
     }
 
-    public void updateOutputDataInteraction(String message, long outputCount, long outputTimeMillis) {
+    protected void updateOutputDataInteraction(String message, long outputCount, long outputTimeMillis) {
         this.outputTimeMillis = outputTimeMillis;
         this.outputMessage = message;
         this.outputCount = outputCount;
@@ -96,7 +94,7 @@ public class NetconfConnection implements NetworkConnection {
         }
     }
 
-    public void setOutputDataInteraction(String message, long outputCount, long outputTimeMillis) {
+    protected void setOutputDataInteraction(String message, long outputCount, long outputTimeMillis) {
         this.outputTimeMillis = outputTimeMillis;
         this.outputMessage = message;
         this.outputCount = outputCount;
@@ -109,13 +107,13 @@ public class NetconfConnection implements NetworkConnection {
         return this.abandoned;
     }
 
-    @Override
-    public boolean isClosed() throws NetworkException {
+
+    public boolean isClosed() throws NetconfException {
         return false;
     }
 
-    @Override
-    public void rollback() throws NetworkException {
+
+    public void rollback() throws NetconfException {
 
     }
 
@@ -131,7 +129,7 @@ public class NetconfConnection implements NetworkConnection {
         return this.netconfSession.hasCapability(Capabilities.WRITABLE_RUNNING_CAPABILITY);
     }
 
-    @Override
+
     public void commit() throws NetconfException {
         throw new NetconfException("not support commit");
     }

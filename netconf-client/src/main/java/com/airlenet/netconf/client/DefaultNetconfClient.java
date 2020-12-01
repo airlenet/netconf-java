@@ -4,7 +4,7 @@ import com.airlenet.netconf.NetconfException;
 import com.airlenet.netconf.api.NetconfClient;
 import com.airlenet.netconf.api.NetconfConnect;
 import com.airlenet.netconf.api.NetconfDevice;
-import com.airlenet.network.NetwokDevice;
+
 import com.google.common.collect.ImmutableSet;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.future.ConnectFuture;
@@ -61,7 +61,7 @@ public class DefaultNetconfClient implements NetconfClient {
             throw new NetconfException("Failed to connect." + e.getMessage(), e);
         }
         ClientSession session = connectFuture.getSession();
-        if (netconfDevice.getAuthType() == NetwokDevice.AuthType.Key) {
+        if (netconfDevice.getAuthType() == NetconfDevice.AuthType.Key) {
             try (PEMParser pemParser = new PEMParser(new FileReader(netconfDevice.getKeyPath()))) {
                 JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME);
                 try {

@@ -1,8 +1,8 @@
 package com.airlenet.netconf.datasource;
 
-import com.airlenet.network.NetworkException;
+//import com.airlenet.network.NetworkException;
 
-public class NetconfException extends NetworkException {
+public class NetconfException extends Exception {
     public NetconfException() {
     }
 

@@ -12,11 +12,11 @@
     <artifactId>netconf-core</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.airlenet.network</groupId>
-            <artifactId>network-core</artifactId>
-            <version>${network.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.airlenet.network</groupId>-->
+<!--            <artifactId>network-core</artifactId>-->
+<!--            <version>${network.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.airlenet.yang</groupId>
             <artifactId>yang-jnc</artifactId>

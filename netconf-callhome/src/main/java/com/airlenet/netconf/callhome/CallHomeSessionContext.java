@@ -105,7 +105,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         if (activated) {
             return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));
         }
-        netconfChannel.getSession().getIoSession().getAcceptanceAddress();
+//        netconfChannel.getSession().getIoSession().getAcceptanceAddress();
         activated = true;
         LOG.info("Activating Netconf channel for {} with {}", getRemoteAddress(), listener);
         Promise<NetconfClientSession> activationPromise = newSessionPromise();

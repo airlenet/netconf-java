@@ -31,9 +31,9 @@
         <module>netconf-rest</module>
         <module>netconf-datasource</module>
         <module>netconf-spring-boot-starter</module>
+        <module>netconf-core</module>
         <module>netconf-client</module>
         <module>netconf-callhome</module>
-        <module>netconf-core</module>
 <!--        <module>network</module>-->
     </modules>
     <dependencyManagement>
@@ -67,7 +67,7 @@
             </snapshots>
             <id>central</id>
             <name>libs-release</name>
-            <url>https://repo.spring.io/libs-release</url>
+            <url>https://maven.aliyun.com/repository/public</url>
         </repository>
         <repository>
             <snapshots />
@@ -81,6 +81,14 @@
             <url>https://airlenet.github.io/maven-release</url>
             <snapshots>
                 <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <name>sonatype snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
             </snapshots>
         </repository>
     </repositories>

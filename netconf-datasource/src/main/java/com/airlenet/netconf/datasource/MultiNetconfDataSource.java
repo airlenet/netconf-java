@@ -1,13 +1,10 @@
 package com.airlenet.netconf.datasource;
 
-import com.airlenet.network.MultiNetworkDataSource;
-import com.airlenet.network.NetworkDataSource;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MultiNetconfDataSource extends NetconfDataSource implements MultiNetworkDataSource {
+public class MultiNetconfDataSource extends NetconfDataSource {
 
     protected final Map<Object, NetconfDataSource> dataSourceObjectMap = new HashMap<>();
     public ReentrantLock lock = new ReentrantLock();
@@ -35,7 +32,7 @@ public class MultiNetconfDataSource extends NetconfDataSource implements MultiNe
         throw new IllegalArgumentException("");
     }
 
-    @Override
+
     public NetconfDataSource getDataSource(String url, String username, String password) throws NetconfException {
         synchronized (dataSourceObjectMap) {
             NetconfDataSource netconfDataSource = dataSourceObjectMap.get(url);
@@ -62,13 +59,13 @@ public class MultiNetconfDataSource extends NetconfDataSource implements MultiNe
         }
     }
 
-    @Override
+
     public NetconfPooledConnection getConnection(String url, String username, String password) throws NetconfException {
         NetconfDataSource dataSource = getDataSource(url, username, password);
         return dataSource.getConnection();
     }
 
-    @Override
+
     public void removeDataSource(String url) throws NetconfException {
         synchronized (dataSourceObjectMap) {
             NetconfDataSource netconfDataSource = dataSourceObjectMap.get(url);
@@ -78,34 +75,30 @@ public class MultiNetconfDataSource extends NetconfDataSource implements MultiNe
         }
     }
 
-    @Override
+
     public void addDataSource(String url, String username, String password) throws NetconfException {
         getDataSource(url, username, password);
     }
 
-    @Override
-    public void removeDataSource(NetworkDataSource dataSource) throws NetconfException {
-        if (dataSource instanceof NetconfDataSource) {
-            NetconfDataSource originalNetconfDataSource = (NetconfDataSource) dataSource;
-            synchronized (dataSourceObjectMap) {
-                NetconfDataSource netconfDataSource = dataSourceObjectMap.get(originalNetconfDataSource.getUrl());
-                if (netconfDataSource != null) {
-                    netconfDataSource.close();
-                }
+
+    public void removeDataSource(NetconfDataSource originalNetconfDataSource) throws NetconfException {
+        synchronized (dataSourceObjectMap) {
+            NetconfDataSource netconfDataSource = dataSourceObjectMap.get(originalNetconfDataSource.getUrl());
+            if (netconfDataSource != null) {
+                netconfDataSource.close();
             }
         }
+
     }
 
-    @Override
-    public void addDataSource(NetworkDataSource dataSource) throws NetconfException {
-        if (dataSource instanceof NetconfDataSource) {
-            NetconfDataSource originalNetconfDataSource = (NetconfDataSource) dataSource;
-            synchronized (dataSourceObjectMap) {
-                NetconfDataSource netconfDataSource = dataSourceObjectMap.get(originalNetconfDataSource.getUrl());
-                if (netconfDataSource == null) {
-                    dataSourceObjectMap.put(originalNetconfDataSource.getUrl(), originalNetconfDataSource);
-                }
+
+    public void addDataSource(NetconfDataSource originalNetconfDataSource) throws NetconfException {
+        synchronized (dataSourceObjectMap) {
+            NetconfDataSource netconfDataSource = dataSourceObjectMap.get(originalNetconfDataSource.getUrl());
+            if (netconfDataSource == null) {
+                dataSourceObjectMap.put(originalNetconfDataSource.getUrl(), originalNetconfDataSource);
             }
         }
+
     }
 }

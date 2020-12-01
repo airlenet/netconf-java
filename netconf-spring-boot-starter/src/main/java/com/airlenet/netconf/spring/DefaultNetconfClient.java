@@ -4,7 +4,6 @@ import com.airlenet.netconf.datasource.MultiNetconfDataSource;
 import com.airlenet.netconf.datasource.NetconfDevice;
 import com.airlenet.netconf.datasource.NetconfException;
 import com.airlenet.netconf.datasource.NetconfPooledConnection;
-import com.airlenet.network.NetworkException;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
 
@@ -58,8 +57,6 @@ public class DefaultNetconfClient implements NetconfClient {
         try (NetconfPooledConnection connection = multiNetconfDataSource.getConnection(netconfDevice.getUrl(), netconfDevice.getUsername(), netconfDevice.getPassword())) {
             connection.updateZoneId(netconfDevice.getZoneId());
             return connection.getConfig(xpath);
-        } catch (NetworkException e) {
-            throw new NetconfException(e);
         }
     }
 
