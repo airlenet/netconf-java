@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class NetconfDataSource extends NetconfAbstractDataSource implements MBeanRegistration, NetconfDataSourceMBean {
+    ThreadLocal<NetconfPooledConnection> connectionThreadLocal = new ThreadLocal<>();
     private static final Logger logger = LoggerFactory.getLogger(NetconfDataSource.class);
     public final static int DEFAULT_MAX_POOL_SIZE = 8;
     public final static int DEFAULT_CONNECTION_TIMEOUT = 0;
@@ -85,6 +86,10 @@ public class NetconfDataSource extends NetconfAbstractDataSource implements MBea
 
     public NetconfPooledConnection getConnection(NetconfSubscriber subscriber) throws NetconfException {
         return this.getConnection(this.connectionTimeout, subscriber);
+    }
+
+    public NetconfPooledConnection getConnection(String url, String username, String password) throws NetconfException {
+        return this.getConnection(username, password);
     }
 
     @Override
@@ -203,8 +208,11 @@ public class NetconfDataSource extends NetconfAbstractDataSource implements MBea
     }
 
     public NetconfPooledConnection getConnectionDirect(long connectionTimeoutMillis, NetconfSubscriber subscriber) throws NetconfException {
-        NetconfPooledConnection pooledConnection = getConnectionInternal(connectionTimeoutMillis, subscriber);
-
+        NetconfPooledConnection pooledConnection = connectionThreadLocal.get();
+        if (pooledConnection == null)
+            pooledConnection = getConnectionInternal(connectionTimeoutMillis, subscriber);
+        pooledConnection.useIncrement();//
+        connectionThreadLocal.set(pooledConnection);
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         pooledConnection.connectStackTrace = stackTrace;
         pooledConnection.setConnectedTimeNano();
@@ -245,7 +253,7 @@ public class NetconfDataSource extends NetconfAbstractDataSource implements MBea
                                 connectTimeMillis = System.currentTimeMillis();
                             }
                             long connectionId = connectCount + 1;
-                            String sessionName = "datasource-" + connectionId + ":" + Math.random();
+                            String sessionName = "datasource-" + connectionId + ":" + ((int)Math.random()*100);
                             NetconfConnection netconfConnection = null;
 
                             JNCSubscriber jncSubscriber = new JNCSubscriber(url, sessionName, subscriber);
@@ -356,6 +364,7 @@ public class NetconfDataSource extends NetconfAbstractDataSource implements MBea
             logger.debug("Discard Netconf Connection {} to DataSource {}", realConnection.getSessionName(), this.url);
             device.closeSession(realConnection.sessionName);
         } finally {
+            connectionThreadLocal.remove();
             lock.unlock();
         }
     }
@@ -388,6 +397,7 @@ public class NetconfDataSource extends NetconfAbstractDataSource implements MBea
             discardConnectCount++;
             throw new NetconfException(e);
         } finally {
+            connectionThreadLocal.remove();
             lock.unlock();
         }
     }

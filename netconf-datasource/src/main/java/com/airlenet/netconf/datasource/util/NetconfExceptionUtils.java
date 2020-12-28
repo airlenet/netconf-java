@@ -11,6 +11,9 @@ import java.net.SocketTimeoutException;
 
 public class NetconfExceptionUtils {
     public static NetconfException getCauseException(Exception e) {
+        if (e instanceof NetconfException) {
+            return (NetconfException) e;
+        }
         if (e instanceof SocketTimeoutException) {
             return new NetconfSocketTimeoutException(e);
         }

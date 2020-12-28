@@ -7,11 +7,10 @@ import com.airlenet.netconf.datasource.NetconfPooledConnection;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
 
-public class DefaultNetconfClient implements NetconfClient {
-
+public class NetconfTransactionClient implements NetconfClient {
     private MultiNetconfDataSource multiNetconfDataSource;
 
-    public DefaultNetconfClient(MultiNetconfDataSource multiNetconfDataSource) {
+    public NetconfTransactionClient(MultiNetconfDataSource multiNetconfDataSource) {
         this.multiNetconfDataSource = multiNetconfDataSource;
     }
 

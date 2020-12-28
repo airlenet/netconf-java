@@ -7,6 +7,7 @@ import com.airlenet.netconf.spring.NetconfClient;
 import com.airlenet.netconf.spring.NetconfClientInvocationHandler;
 import com.airlenet.netconf.spring.autoconfigure.stat.NetconfSpringAopConfiguration;
 import com.airlenet.netconf.spring.autoconfigure.stat.NetconfStatViewServletConfiguration;
+import com.airlenet.netconf.spring.transaction.NetconfTransactionAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -43,10 +44,13 @@ public class NetconfDataSourceAutoConfigure {
         return multiDataSource;
     }
 
-//    @Bean
-//    public NetconfClientInvocationHandler netconfClientInvocationHandler() {
-//        return new NetconfClientInvocationHandler(multiNetconfDataSource(), netconfProperties);
-//    }
+    @Bean
+    @ConditionalOnMissingBean
+    public NetconfTransactionAdvisor netconfTransactionAdvisor() {
+        NetconfTransactionAdvisor netconfTransactionAdvisor = new NetconfTransactionAdvisor();
+        netconfTransactionAdvisor.setMultiNetconfDataSource(multiNetconfDataSource());
+        return netconfTransactionAdvisor;
+    }
 
     @Bean
     @ConditionalOnMissingBean

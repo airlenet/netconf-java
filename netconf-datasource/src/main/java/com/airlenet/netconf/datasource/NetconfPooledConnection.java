@@ -4,11 +4,13 @@ import com.airlenet.netconf.datasource.util.Utils;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class NetconfPooledConnection extends NetconfConnection implements AutoCloseable {
 
     public ReentrantLock lock = new ReentrantLock();
+    public AtomicInteger useCount = new AtomicInteger(0);
     protected final Thread ownerThread;
     public StackTraceElement[] connectStackTrace;
 
@@ -43,6 +45,10 @@ public class NetconfPooledConnection extends NetconfConnection implements AutoCl
         return conn;
     }
 
+    public int useIncrement() {
+        return useCount.incrementAndGet();
+    }
+
     @Override
     public void close() throws NetconfException {
         if (this.disable) {
@@ -68,15 +74,18 @@ public class NetconfPooledConnection extends NetconfConnection implements AutoCl
         if (this.disable) {
             return;
         }
-        if (conn.abandoned) {//废弃此链接
-            holder.dataSource.discardConnection(this);
-        } else {//回收链接
-            holder.dataSource.recycle(this);
-        }
-        holder.recycle();
+        int count = useCount.decrementAndGet();
+        if (count <= 0) {
+            if (conn.abandoned) {//废弃此链接
+                holder.dataSource.discardConnection(this);
+            } else {//回收链接
+                holder.dataSource.recycle(this);
+            }
+            holder.recycle();
 
-        this.holder = null;
-        closed = true;
+            this.holder = null;
+            closed = true;
+        }
     }
 
     public void discard() throws NetconfException {
@@ -258,6 +267,30 @@ public class NetconfPooledConnection extends NetconfConnection implements AutoCl
     protected void updateOutputDataInteraction(String message, long outputCount, long outputTimeMillis) {
         if (conn != null)
             conn.updateOutputDataInteraction(message, outputCount, outputTimeMillis);
+    }
+
+    @Override
+    public void startTransaction() throws Exception {
+        if (conn != null)
+            conn.startTransaction();
+    }
+
+    @Override
+    public void commitTransaction() throws Exception {
+        if (conn != null)
+            conn.commitTransaction();
+    }
+
+    @Override
+    public void setAutoCommit(boolean autoCommit) {
+        if (conn != null)
+            conn.setAutoCommit(autoCommit);
+    }
+
+    @Override
+    public void unlock() throws Exception {
+        if (conn != null)
+            conn.unlock();
     }
 
     public String getRunStackTrace() {
