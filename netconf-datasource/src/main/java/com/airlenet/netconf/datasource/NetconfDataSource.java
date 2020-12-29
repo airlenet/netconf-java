@@ -253,7 +253,7 @@ public class NetconfDataSource extends NetconfAbstractDataSource implements MBea
                                 connectTimeMillis = System.currentTimeMillis();
                             }
                             long connectionId = connectCount + 1;
-                            String sessionName = "datasource-" + connectionId + ":" + ((int)Math.random()*100);
+                            String sessionName = "datasource-" + connectionId + ":" + (int)(Math.random()*100);
                             NetconfConnection netconfConnection = null;
 
                             JNCSubscriber jncSubscriber = new JNCSubscriber(url, sessionName, subscriber);
