@@ -18,7 +18,7 @@ public class NetconfConnection {
     protected long outputCount;
     protected String outputMessage;
     protected volatile boolean abandoned = false;
-    protected boolean transaction = true;
+    protected boolean autoCommit = true;
     protected JNCSubscriber jncSubscriber;
     protected String stream;
     NetconfDataSource netconfDataSource;
@@ -135,11 +135,11 @@ public class NetconfConnection {
     }
 
     public boolean getAutoCommit() {
-        return this.transaction;
+        return this.autoCommit;
     }
 
     public void setAutoCommit(boolean autoCommit) {
-        this.transaction = autoCommit;
+        this.autoCommit = autoCommit;
     }
 
     public NodeSet callRpc(Element data) throws NetconfException {
@@ -257,81 +257,83 @@ public class NetconfConnection {
     }
 
     public void editConfig(NodeSet nodeSet) throws NetconfException {
-        if (isCandidate()) {
-            if (this.transaction) {
-                try {
-                    netconfSession.discardChanges();//现将 上次没有提交的配置 还原
-                    netconfSession.lock(NetconfSession.CANDIDATE);
-
-                    netconfSession.copyConfig(NetconfSession.RUNNING, NetconfSession.CANDIDATE);
-                    this.netconfSession.editConfig(NetconfSession.CANDIDATE, nodeSet);
-                    if (isConfirmedCommit()) {
-                        netconfSession.confirmedCommit(60);// candidates are now updated 1分钟内没有确认 则还原配置
-                    }
-                    netconfSession.commit();//now commit them 确认提交
-                } catch (Exception e) {
-                    throw getCauseException(e);
-                } finally {
+        synchronized (netconfDataSource.getUrl().intern()){
+            if (isCandidate()) {
+                if (this.autoCommit) {
                     try {
-                        netconfSession.unlock(NetconfSession.CANDIDATE);
+                        netconfSession.discardChanges();//现将 上次没有提交的配置 还原
+                        netconfSession.lock(NetconfSession.CANDIDATE);
+
+                        netconfSession.copyConfig(NetconfSession.RUNNING, NetconfSession.CANDIDATE);
+                        this.netconfSession.editConfig(NetconfSession.CANDIDATE, nodeSet);
+                        if (isConfirmedCommit()) {
+                            netconfSession.confirmedCommit(60);// candidates are now updated 1分钟内没有确认 则还原配置
+                        }
+                        netconfSession.commit();//now commit them 确认提交
+                    } catch (Exception e) {
+                        throw getCauseException(e);
+                    } finally {
+                        try {
+                            netconfSession.unlock(NetconfSession.CANDIDATE);
+                        } catch (Exception e) {
+                            throw getCauseException(e);
+                        }
+                    }
+                } else {
+                    try {
+                        this.netconfSession.editConfig(NetconfSession.CANDIDATE, nodeSet);
                     } catch (Exception e) {
                         throw getCauseException(e);
                     }
                 }
             } else {
                 try {
-                    this.netconfSession.editConfig(NetconfSession.CANDIDATE, nodeSet);
+                    netconfSession.editConfig(nodeSet);
                 } catch (Exception e) {
                     throw getCauseException(e);
                 }
             }
-        } else {
-            try {
-                netconfSession.editConfig(nodeSet);
-            } catch (Exception e) {
-                throw getCauseException(e);
-            }
         }
-
     }
 
     public void editConfig(Element configTree) throws NetconfException {
-        if (isCandidate()) {
-            if (this.transaction) {
-                try {
-                    netconfSession.discardChanges();//现将 上次没有提交的配置 还原
-                    netconfSession.lock(NetconfSession.CANDIDATE);
-
-                    netconfSession.copyConfig(NetconfSession.RUNNING, NetconfSession.CANDIDATE);
-                    this.netconfSession.editConfig(NetconfSession.CANDIDATE, configTree);
-                    if (isConfirmedCommit()) {
-                        netconfSession.confirmedCommit(60);// candidates are now updated 1分钟内没有确认 则还原配置
-                    }
-                    netconfSession.commit();//now commit them 确认提交
-                } catch (Exception e) {
-                    throw getCauseException(e);
-                } finally {
+        synchronized (netconfDataSource.getUrl().intern()){
+            if (isCandidate()) {
+                if (this.autoCommit) {
                     try {
-                        netconfSession.unlock(NetconfSession.CANDIDATE);
+                        netconfSession.discardChanges();//现将 上次没有提交的配置 还原
+                        netconfSession.lock(NetconfSession.CANDIDATE);
+
+                        netconfSession.copyConfig(NetconfSession.RUNNING, NetconfSession.CANDIDATE);
+                        this.netconfSession.editConfig(NetconfSession.CANDIDATE, configTree);
+                        if (isConfirmedCommit()) {
+                            netconfSession.confirmedCommit(60);// candidates are now updated 1分钟内没有确认 则还原配置
+                        }
+                        netconfSession.commit();//now commit them 确认提交
+                    } catch (Exception e) {
+                        throw getCauseException(e);
+                    } finally {
+                        try {
+                            netconfSession.unlock(NetconfSession.CANDIDATE);
+                        } catch (Exception e) {
+                            throw getCauseException(e);
+                        }
+                    }
+                } else {
+                    try {
+                        this.netconfSession.editConfig(NetconfSession.CANDIDATE, configTree);
                     } catch (Exception e) {
                         throw getCauseException(e);
                     }
                 }
             } else {
                 try {
-                    this.netconfSession.editConfig(NetconfSession.CANDIDATE, configTree);
+                    netconfSession.editConfig(configTree);
                 } catch (Exception e) {
                     throw getCauseException(e);
                 }
             }
-        } else {
-            try {
-                netconfSession.editConfig(configTree);
-            } catch (Exception e) {
-                throw getCauseException(e);
-            }
         }
-
     }
 
     public void setReadTimeout(long readTimeout) {

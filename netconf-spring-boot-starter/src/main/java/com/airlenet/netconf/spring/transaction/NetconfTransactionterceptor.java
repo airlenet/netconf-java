@@ -1,19 +1,14 @@
 package com.airlenet.netconf.spring.transaction;
 
-import com.airlenet.netconf.datasource.MultiNetconfDataSource;
 import com.airlenet.netconf.datasource.NetconfDataSource;
 import com.airlenet.netconf.datasource.NetconfPooledConnection;
-import com.airlenet.netconf.spring.NetconfClient;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-
-import java.lang.reflect.Method;
 
 public class NetconfTransactionterceptor implements MethodInterceptor {
     protected NetconfDataSource netconfDataSource;
@@ -35,6 +30,7 @@ public class NetconfTransactionterceptor implements MethodInterceptor {
 
         NetconfPooledConnection connection;
         Object proceed = null;
+        //todo 增加transactionManage，待需要时 开启事务，即editconfig操作
         try (NetconfPooledConnection pooledConnection = (netconfDataSource).getConnection(url, username, password);) {
             try {
                 pooledConnection.setAutoCommit(false);
