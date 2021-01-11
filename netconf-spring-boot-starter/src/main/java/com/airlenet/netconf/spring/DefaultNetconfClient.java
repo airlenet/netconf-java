@@ -16,6 +16,13 @@ public class DefaultNetconfClient implements NetconfClient {
     }
 
     @Override
+    public String getCapabilityRevision(NetconfDevice netconfDevice, String uri)  throws NetconfException{
+        try (NetconfPooledConnection connection = multiNetconfDataSource.getConnection(netconfDevice.getUrl(), netconfDevice.getUsername(), netconfDevice.getPassword())) {
+            return connection.getConnection().getCapabilities().getRevision(uri);
+        }
+    }
+
+    @Override
     public NodeSet get(String url, String username, String password, String xpath) throws NetconfException {
         try (NetconfPooledConnection connection = multiNetconfDataSource.getConnection(url, username, password)) {
             return connection.get(xpath);

@@ -8,6 +8,8 @@ import com.tailf.jnc.NodeSet;
 
 public interface NetconfClient {
 
+    public String getCapabilityRevision(NetconfDevice netconfDevice, String uri) throws NetconfException;
+
     public NodeSet get(String url, String username, String password, String xpath) throws NetconfException;
 
     public NodeSet get(NetconfDevice netconfDevice, String xpath) throws NetconfException;
