@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 public @interface YangMethod {
 
     @AliasFor("moduleClass")
-    String[] value() default {};
+    Class<?>[] value() default {};
 
     @AliasFor("value")
     Class<?>[] moduleClass() default {};
