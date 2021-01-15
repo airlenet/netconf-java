@@ -4,6 +4,7 @@ import com.airlenet.netconf.datasource.MultiNetconfDataSource;
 import com.airlenet.netconf.datasource.NetconfDevice;
 import com.airlenet.netconf.datasource.NetconfException;
 import com.airlenet.netconf.datasource.NetconfPooledConnection;
+import com.tailf.jnc.Capabilities;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
 
@@ -16,9 +17,9 @@ public class DefaultNetconfClient implements NetconfClient {
     }
 
     @Override
-    public String getCapabilityRevision(NetconfDevice netconfDevice, String uri)  throws NetconfException{
+    public Capabilities.Capa getCapability(NetconfDevice netconfDevice, String uri) throws NetconfException {
         try (NetconfPooledConnection connection = multiNetconfDataSource.getConnection(netconfDevice.getUrl(), netconfDevice.getUsername(), netconfDevice.getPassword())) {
-            return connection.getConnection().getCapabilities().getRevision(uri);
+            return connection.getConnection().getCapabilities().getCapa(uri);
         }
     }
 

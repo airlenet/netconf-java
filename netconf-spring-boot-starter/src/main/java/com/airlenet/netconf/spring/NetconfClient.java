@@ -3,12 +3,13 @@ package com.airlenet.netconf.spring;
 import com.airlenet.netconf.datasource.NetconfDevice;
 import com.airlenet.netconf.datasource.NetconfException;
 import com.airlenet.netconf.datasource.NetconfPooledConnection;
+import com.tailf.jnc.Capabilities;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
 
 public interface NetconfClient {
 
-    public String getCapabilityRevision(NetconfDevice netconfDevice, String uri) throws NetconfException;
+    public Capabilities.Capa getCapability(NetconfDevice netconfDevice, String uri) throws NetconfException;
 
     public NodeSet get(String url, String username, String password, String xpath) throws NetconfException;
 

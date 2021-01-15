@@ -2,6 +2,8 @@ package com.airlenet.netconf.spring.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.List;
+
 @ConfigurationProperties(prefix = "spring.netconf")
 public class NetconfProperties {
     private String[] aopPatterns;
@@ -22,7 +24,6 @@ public class NetconfProperties {
     private DefaultOperation defaultOperation = DefaultOperation.NOT_SET;
 
     private StatViewServlet statViewServlet = new StatViewServlet();
-
 
     public int getConnectionTimeout() {
         return connectionTimeout;

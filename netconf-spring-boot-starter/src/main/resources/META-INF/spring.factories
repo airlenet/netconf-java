@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.airlenet.netconf.spring.autoconfigure.NetconfDataSourceAutoConfigure
+  com.airlenet.netconf.spring.autoconfigure.NetconfDataSourceAutoConfigure,\
+  com.airlenet.netconf.multirevision.spring.autoconfig.YangServiceAutoConfigure
