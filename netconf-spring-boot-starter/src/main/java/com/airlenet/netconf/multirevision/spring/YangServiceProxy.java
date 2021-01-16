@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 
 public class YangServiceProxy<T> implements InvocationHandler, Serializable {
     private final Class<T> yangServiceInterface;
@@ -23,24 +24,29 @@ public class YangServiceProxy<T> implements InvocationHandler, Serializable {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         NetconfDevice netconfDevice = (NetconfDevice) args[0];
-        Capabilities.Capa capa = null;
-        String ns = null;
         YangMethodInfo.YangCapabilityInfo capabilityInfo = null;
         List<YangMethodInfo.YangCapabilityInfo> yangCapabilityInfoList = yangServiceMapping.getYangCapabilityInfo(method);
-        for (YangMethodInfo.YangCapabilityInfo cap : yangCapabilityInfoList) {
-            capa = netconfClient.getCapability(netconfDevice, cap.getNamespace());
-            if (capa.getModule().equals(cap.getModule()) && (cap.getRevision() == null ? cap.getRevision().equals("")
-                    : capa.getRevision().equals(cap.getRevision()))) {
-                capabilityInfo = cap;
-                break;
+
+        Capabilities capabilities = netconfClient.getCapabilities(netconfDevice);
+        List<Capabilities.Capa> dataCapas = capabilities.getDataCapas();
+        for (Capabilities.Capa curCapa : dataCapas) {
+            for (YangMethodInfo.YangCapabilityInfo yangCapabilityInfo : yangCapabilityInfoList) {
+                if (Objects.equals(yangCapabilityInfo.getNamespace(), curCapa.getUri())
+                        && Objects.equals(yangCapabilityInfo.getModule(), curCapa.getModule())
+                        && Objects.equals(yangCapabilityInfo.getRevision(), curCapa.getRevision())
+                ) {
+                    capabilityInfo = yangCapabilityInfo;
+                    break;
+                }
             }
         }
+
         if (!yangCapabilityInfoList.isEmpty() && capabilityInfo == null) {
-            throw new NetconfException("Not Implemented capability for device" + netconfDevice);
+            throw new NetconfException("Not Implemented capability @YangMethod" + method.toString());
         }
         YangHandlerMethod handler = yangServiceMapping.getHandler(method, capabilityInfo);
         if (handler == null) {
-            throw new NetconfException("Not exists YangMethod " + method.getName() + " for XXX");
+            throw new NetconfException("Not Implemented capability @YangMethod " + method.toString() + " for capability: module=" + capabilityInfo.getModule() + " ns=" + capabilityInfo.getNamespace() + " revision=" + capabilityInfo.getRevision());
         }
         try {
             return handler.getMethod().invoke(handler.getBean(), args);

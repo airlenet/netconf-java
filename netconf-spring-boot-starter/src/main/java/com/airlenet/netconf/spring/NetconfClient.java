@@ -9,7 +9,7 @@ import com.tailf.jnc.NodeSet;
 
 public interface NetconfClient {
 
-    public Capabilities.Capa getCapability(NetconfDevice netconfDevice, String uri) throws NetconfException;
+    public Capabilities getCapabilities(NetconfDevice netconfDevice) throws NetconfException;
 
     public NodeSet get(String url, String username, String password, String xpath) throws NetconfException;
 

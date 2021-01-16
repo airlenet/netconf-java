@@ -18,9 +18,12 @@ public class YangMethodInfo {
         this.priority = priority;
         yangCapabilityInfo = new ArrayList<>();
         for (Class<?> clazz : prefixClass) {
-            yangCapabilityInfo.add(new YangCapabilityInfo( clazz.getDeclaredField("NAMESPACE").get(null).toString(),
-                    clazz.getDeclaredField("MODULE_NAME").get(null).toString(), clazz.getDeclaredField("REVISION").get(null).toString()))
-           ;
+            Object revision = clazz.getDeclaredField("REVISION").get(null);
+            Object namespace = clazz.getDeclaredField("NAMESPACE").get(null);
+            Object moduleName = clazz.getDeclaredField("MODULE_NAME").get(null);
+            yangCapabilityInfo.add(new YangCapabilityInfo(namespace.toString(),
+                    moduleName == null ? null : moduleName.toString(), revision == null ? null : revision.toString()))
+            ;
         }
     }
 

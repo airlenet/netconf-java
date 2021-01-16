@@ -66,7 +66,7 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
     }
 
     public YangHandlerMethod getHandler(Method method, YangMethodInfo.YangCapabilityInfo capability) {
-        List<YangMethodInfo> yangMethodInfos = this.mappingRegistry.urlLookup.get(method.getDeclaringClass().getTypeName() + method.getName() + (capability == null ? "" : capability.getCapabilityUri()));
+        List<YangMethodInfo> yangMethodInfos = this.mappingRegistry.urlLookup.get(getMethodUniStr(method) + (capability == null ? "" : capability.getCapabilityUri()));
         if (yangMethodInfos == null)
             return null;
         for (YangMethodInfo yangMethodInfo : yangMethodInfos) {
@@ -77,8 +77,25 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
     }
 
     public List<YangMethodInfo.YangCapabilityInfo> getYangCapabilityInfo(Method method) {
-        List<YangMethodInfo.YangCapabilityInfo> yangCapabilityInfos = this.mappingRegistry.methodLookup.get(method.getDeclaringClass().getTypeName() + method.getName());
+        List<YangMethodInfo.YangCapabilityInfo> yangCapabilityInfos = this.mappingRegistry.methodLookup.get(getMethodUniStr(method));
         return yangCapabilityInfos;
+    }
+
+    public String getMethodUniStr(Method method) {
+        StringBuilder sb = new StringBuilder();
+        Class<?> declaringClass = method.getDeclaringClass();
+        if(declaringClass.isInterface()){
+            sb.append(declaringClass.getTypeName()).append('.');
+        }else{
+            sb.append(declaringClass.getInterfaces()[0].getTypeName()).append('.');
+        }
+
+        sb.append(method.getName());
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        for (Class<?> clazz : parameterTypes) {
+            sb.append(clazz.getTypeName());
+        }
+        return sb.toString();
     }
 
     class MappingRegistry {
@@ -89,15 +106,15 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
         public void register(YangMethodInfo mapping, Object handler, Method method) {
             mappingLookup.put(mapping, createHandlerMethod(handler, method));
 
-
+            String methodUniStr = getMethodUniStr(method);
             List<YangMethodInfo.YangCapabilityInfo> yangCapabilities = mapping.getYangCapabilities();
             if (yangCapabilities.isEmpty()) {
-                urlLookup.add(method.getDeclaringClass().getInterfaces()[0].getTypeName() + method.getName(), mapping);
-                methodLookup.addAll(method.getDeclaringClass().getInterfaces()[0].getTypeName() + method.getName(), yangCapabilities);
+                urlLookup.add(methodUniStr, mapping);
+                methodLookup.addAll(methodUniStr, yangCapabilities);
             } else {
                 yangCapabilities.forEach(yangCapabilityInfo -> {
-                    urlLookup.add(method.getDeclaringClass().getInterfaces()[0].getTypeName() + method.getName() + yangCapabilityInfo.getCapabilityUri(), mapping);
-                    methodLookup.add(method.getDeclaringClass().getInterfaces()[0].getTypeName() + method.getName(), yangCapabilityInfo);
+                    urlLookup.add(methodUniStr + yangCapabilityInfo.getCapabilityUri(), mapping);
+                    methodLookup.add(methodUniStr, yangCapabilityInfo);
 
                 });
             }

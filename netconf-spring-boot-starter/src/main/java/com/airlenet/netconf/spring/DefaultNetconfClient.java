@@ -17,9 +17,9 @@ public class DefaultNetconfClient implements NetconfClient {
     }
 
     @Override
-    public Capabilities.Capa getCapability(NetconfDevice netconfDevice, String uri) throws NetconfException {
+    public Capabilities getCapabilities(NetconfDevice netconfDevice) throws NetconfException {
         try (NetconfPooledConnection connection = multiNetconfDataSource.getConnection(netconfDevice.getUrl(), netconfDevice.getUsername(), netconfDevice.getPassword())) {
-            return connection.getConnection().getCapabilities().getCapa(uri);
+            return connection.getConnection().getCapabilities();
         }
     }
 
