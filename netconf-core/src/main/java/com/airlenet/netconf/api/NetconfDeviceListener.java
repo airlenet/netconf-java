@@ -1,4 +1,4 @@
-package com.airlenet.netconf;
+package com.airlenet.netconf.api;
 
 public interface NetconfDeviceListener {
 }

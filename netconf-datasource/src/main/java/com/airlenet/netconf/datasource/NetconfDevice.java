@@ -1,9 +1,10 @@
 package com.airlenet.netconf.datasource;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NetconfDevice {
+public class NetconfDevice implements Serializable, Cloneable {
     private String url;
     private String host;
     private int port;

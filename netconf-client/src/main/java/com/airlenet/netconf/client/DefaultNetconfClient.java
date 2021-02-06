@@ -1,6 +1,7 @@
 package com.airlenet.netconf.client;
 
-import com.airlenet.netconf.NetconfException;
+import com.airlenet.netconf.api.NetconfSession;
+import com.airlenet.netconf.exception.NetconfException;
 import com.airlenet.netconf.api.NetconfClient;
 import com.airlenet.netconf.api.NetconfConnect;
 import com.airlenet.netconf.api.NetconfDevice;
@@ -35,10 +36,10 @@ public class DefaultNetconfClient implements NetconfClient {
 
 
         if (idleTimeout != -1) {
-            sshClient.getProperties().putIfAbsent(FactoryManager.IDLE_TIMEOUT,
-                    TimeUnit.SECONDS.toMillis(idleTimeout));
-            sshClient.getProperties().putIfAbsent(FactoryManager.NIO2_READ_TIMEOUT,
-                    TimeUnit.SECONDS.toMillis(idleTimeout + 15L));
+//            sshClient.getProperties().putIfAbsent(FactoryManager.IDLE_TIMEOUT,
+//                    TimeUnit.SECONDS.toMillis(idleTimeout));
+//            sshClient.getProperties().putIfAbsent(FactoryManager.NIO2_READ_TIMEOUT,
+//                    TimeUnit.SECONDS.toMillis(idleTimeout + 15L));
         }
         this.sshClient.start();
     }
@@ -47,40 +48,44 @@ public class DefaultNetconfClient implements NetconfClient {
         return new DefaultNetconfClient(SshClient.setUpDefaultClient());
     }
 
+    @Override
+    public NetconfSession getNetconfSession(NetconfDevice netconfDevice) throws NetconfException {
+        return null;
+    }
 
     @Override
-    public NetconfConnect getNetconfClientConnect(NetconfDevice netconfDevice) throws NetconfException {
+    public NetconfConnect getNetconfConnect(NetconfDevice netconfDevice) throws NetconfException {
 
         ConnectFuture connectFuture = null;
         try {
             connectFuture = sshClient.connect(netconfDevice.getUsername(),
-                    netconfDevice.getIp(),
+                    netconfDevice.getHost(),
                     netconfDevice.getPort())
                     .verify(netconfDevice.getConnectTimeout(), TimeUnit.SECONDS);
         } catch (IOException e) {
             throw new NetconfException("Failed to connect." + e.getMessage(), e);
         }
         ClientSession session = connectFuture.getSession();
-        if (netconfDevice.getAuthType() == NetconfDevice.AuthType.Key) {
-            try (PEMParser pemParser = new PEMParser(new FileReader(netconfDevice.getKeyPath()))) {
-                JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME);
-                try {
-                    KeyPair kp = converter.getKeyPair((PEMKeyPair) pemParser.readObject());
-                    session.addPublicKeyIdentity(kp);
-                } catch (IOException e) {
-                    throw new NetconfException("Failed to authenticate session. Please check if ssk key is generated" +
-                            " on   host machine at path " + netconfDevice.getKeyPath() + " : ", e);
-                }
-            } catch (FileNotFoundException e) {
-                throw new NetconfException("Failed to authenticate session. Please check if ssk key is generated" +
-                        " on   host machine at path " + netconfDevice.getKeyPath() + " : ", e);
-            } catch (IOException e) {
-                throw new NetconfException("Failed to authenticate session. Please check if ssk key is generated" +
-                        " on   host machine at path " + netconfDevice.getKeyPath() + " : ", e);
-            }
-        } else {
+//        if (netconfDevice.getAuthType() == NetconfDevice.AuthType.Key) {
+//            try (PEMParser pemParser = new PEMParser(new FileReader(netconfDevice.getKeyPath()))) {
+//                JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME);
+//                try {
+//                    KeyPair kp = converter.getKeyPair((PEMKeyPair) pemParser.readObject());
+//                    session.addPublicKeyIdentity(kp);
+//                } catch (IOException e) {
+//                    throw new NetconfException("Failed to authenticate session. Please check if ssk key is generated" +
+//                            " on   host machine at path " + netconfDevice.getKeyPath() + " : ", e);
+//                }
+//            } catch (FileNotFoundException e) {
+//                throw new NetconfException("Failed to authenticate session. Please check if ssk key is generated" +
+//                        " on   host machine at path " + netconfDevice.getKeyPath() + " : ", e);
+//            } catch (IOException e) {
+//                throw new NetconfException("Failed to authenticate session. Please check if ssk key is generated" +
+//                        " on   host machine at path " + netconfDevice.getKeyPath() + " : ", e);
+//            }
+//        } else {
             session.addPasswordIdentity(netconfDevice.getPassword());
-        }
+//        }
 
         try {
             session.auth().verify(netconfDevice.getConnectTimeout(), TimeUnit.SECONDS);

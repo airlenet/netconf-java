@@ -6,6 +6,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoop;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.concurrent.EventExecutor;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelSubsystem;
@@ -27,8 +28,9 @@ public class NetconfNettyClient {
          EventExecutor executor = new DefaultEventLoop();
         final Bootstrap b = new Bootstrap();
         b.group(globalWorkerGroup);
-        InetSocketAddress address = new InetSocketAddress(6666);
+        InetSocketAddress address = new InetSocketAddress(2022);
         SshClient sshClient = SshClient.setUpDefaultClient();
+
         final NetconfSessionPromise<NetconfSession> p = new NetconfSessionPromise(executor,address,sshClient,b);
         b.option(ChannelOption.SO_KEEPALIVE,true).handler(new ChannelInitializer<SocketChannel>() {
 
@@ -117,7 +119,7 @@ public class NetconfNettyClient {
                         final ByteBuf byteBufMsg = (ByteBuf) msg;
 //                        byteBufMsg.
                         try {
-                            channel.getAsyncIn().writePacket(new ByteArrayBuffer()).addListener(future->{
+                            channel.getAsyncIn().writeBuffer(new ByteArrayBuffer()).addListener(future->{
 
                                 if(future.isWritten()){
                                     promise.setSuccess();

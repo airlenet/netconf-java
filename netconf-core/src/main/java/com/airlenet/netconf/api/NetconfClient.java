@@ -1,7 +1,11 @@
 package com.airlenet.netconf.api;
 
-import com.airlenet.netconf.NetconfException;
+import com.airlenet.netconf.exception.NetconfException;
 
 public interface NetconfClient {
-    NetconfConnect getNetconfClientConnect(NetconfDevice netconfDevice) throws NetconfException;
+    NetconfSession getNetconfSession(NetconfDevice netconfDevice) throws NetconfException;
+
+    default NetconfConnect getNetconfConnect(NetconfDevice netconfDevice) throws NetconfException {
+        return null;
+    }
 }

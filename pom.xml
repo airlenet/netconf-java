@@ -17,7 +17,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <springframework.version>4.3.10.RELEASE</springframework.version>
+<!--        <springframework.version>4.3.10.RELEASE</springframework.version>-->
         <spring-boot.version>2.0.3.RELEASE</spring-boot.version>
         <spring-cloud.version>Finchley.SR2</spring-cloud.version>
         <querydsl.version>4.1.4</querydsl.version>
@@ -60,54 +60,54 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>libs-release</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-        </repository>
-        <repository>
-            <snapshots />
-            <id>snapshots</id>
-            <name>libs-snapshot</name>
-            <url>https://repo.spring.io/libs-snapshot</url>
-        </repository>
-        <repository>
-            <id>airlenet-releases</id>
-            <name>Airlenet Releases</name>
-            <url>https://airlenet.github.io/maven-release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <name>sonatype snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>plugins-release</name>
-            <url>https://repo.spring.io/plugins-release</url>
-        </pluginRepository>
-        <pluginRepository>
-            <snapshots />
-            <id>snapshots</id>
-            <name>plugins-snapshot</name>
-            <url>https://repo.spring.io/plugins-snapshot</url>
-        </pluginRepository>
-    </pluginRepositories>
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <snapshots>-->
+<!--                <enabled>false</enabled>-->
+<!--            </snapshots>-->
+<!--            <id>central</id>-->
+<!--            <name>libs-release</name>-->
+<!--            <url>https://maven.aliyun.com/repository/public</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <snapshots />-->
+<!--            <id>snapshots</id>-->
+<!--            <name>libs-snapshot</name>-->
+<!--            <url>https://repo.spring.io/libs-snapshot</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>airlenet-releases</id>-->
+<!--            <name>Airlenet Releases</name>-->
+<!--            <url>https://airlenet.github.io/maven-release</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>false</enabled>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>sonatype-snapshots</id>-->
+<!--            <name>sonatype snapshots</name>-->
+<!--            <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
+<!--    </repositories>-->
+<!--    <pluginRepositories>-->
+<!--        <pluginRepository>-->
+<!--            <snapshots>-->
+<!--                <enabled>false</enabled>-->
+<!--            </snapshots>-->
+<!--            <id>central</id>-->
+<!--            <name>plugins-release</name>-->
+<!--            <url>https://repo.spring.io/plugins-release</url>-->
+<!--        </pluginRepository>-->
+<!--        <pluginRepository>-->
+<!--            <snapshots />-->
+<!--            <id>snapshots</id>-->
+<!--            <name>plugins-snapshot</name>-->
+<!--            <url>https://repo.spring.io/plugins-snapshot</url>-->
+<!--        </pluginRepository>-->
+<!--    </pluginRepositories>-->
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>

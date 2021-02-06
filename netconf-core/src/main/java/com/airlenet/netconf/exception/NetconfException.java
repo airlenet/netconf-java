@@ -1,4 +1,4 @@
-package com.airlenet.netconf;
+package com.airlenet.netconf.exception;
 
 public class NetconfException extends Exception {
     public NetconfException() {

@@ -16,7 +16,6 @@ public class DefaultNetconfDevice implements NetconfDevice {
     private int port;
     private int connectTimeout = 10;
     private int replyTimeout = 10;
-    private AuthType authType = AuthType.Password;
 
     public DefaultNetconfDevice(String ipAddress, int port, String username, String password) {
         this.username = username;
@@ -54,9 +53,15 @@ public class DefaultNetconfDevice implements NetconfDevice {
     }
 
     @Override
-    public String getIp() {
-        return this.ipAddress;
+    public String getUrl() {
+        return null;
     }
+
+    @Override
+    public String getHost() {
+        return ipAddress;
+    }
+
 
     @Override
     public int getPort() {
@@ -64,9 +69,15 @@ public class DefaultNetconfDevice implements NetconfDevice {
     }
 
     @Override
-    public String getProtocol() {
-        return "netconf";
+    public String getVersion() {
+        return null;
     }
+
+    @Override
+    public String getZoneId() {
+        return null;
+    }
+
 
     @Override
     public String getUsername() {
@@ -74,22 +85,8 @@ public class DefaultNetconfDevice implements NetconfDevice {
     }
 
     @Override
-    public AuthType getAuthType() {
-        return authType;
-    }
-
-    @Override
     public String getPassword() {
         return this.password;
     }
 
-    @Override
-    public File getKeyPath() {
-        return null;
-    }
-
-    @Override
-    public KeyPair getKeyPair() {
-        return null;
-    }
 }

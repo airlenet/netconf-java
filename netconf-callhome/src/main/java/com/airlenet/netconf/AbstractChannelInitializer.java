@@ -2,7 +2,7 @@ package com.airlenet.netconf;
 
 import com.airlenet.netconf.nettyutil.handler.FramingMechanism;
 import com.airlenet.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
-import com.airlenet.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;
+//import com.airlenet.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;
 import io.netty.util.concurrent.Promise;
 import io.netty.channel.Channel;
 
@@ -28,7 +28,7 @@ public abstract class AbstractChannelInitializer<S> {
     protected void initializeMessageEncoder(Channel ch) {
         // Special encoding handler for hello message to include additional header if available,
         // it is thrown away after successful negotiation
-        ch.pipeline().addLast(NETCONF_MESSAGE_ENCODER, new NetconfHelloMessageToXMLEncoder());
+//        ch.pipeline().addLast(NETCONF_MESSAGE_ENCODER, new NetconfHelloMessageToXMLEncoder());
     }
 
     protected void initializeMessageDecoder(Channel ch) {

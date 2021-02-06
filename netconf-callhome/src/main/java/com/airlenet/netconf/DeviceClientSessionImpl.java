@@ -14,12 +14,12 @@ public class DeviceClientSessionImpl extends ClientSessionImpl {
     }
 
     @Override
-    protected boolean readIdentification(Buffer buffer) throws IOException {
+    protected boolean readIdentification(Buffer buffer) throws Exception {
         return super.readIdentification(buffer);
     }
 
     @Override
-    protected List<String> doReadIdentification(Buffer buffer, boolean server) {
+    protected List<String> doReadIdentification(Buffer buffer, boolean server) throws IOException {
         buffer.rpos(9);
         return super.doReadIdentification(buffer, server);
     }

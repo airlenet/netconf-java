@@ -1,10 +1,10 @@
 package com.airlenet.netconf.api;
 
-import java.io.File;
-import java.io.Serializable;
-import java.security.KeyPair;
+import com.airlenet.netconf.exception.NetconfException;
 
-public interface NetconfDevice  {
+import java.io.Serializable;
+
+public interface NetconfDevice {
 
     /**
      * 设备Id
@@ -28,11 +28,16 @@ public interface NetconfDevice  {
     String getSerialNumber();
 
     /**
-     * 访问地址
+     * 访问协议
+     * netconf://ssh://username:password@hostname:port
+     * netconf://tcp://username:password@hostname:port
+     * callhome://ssh://username:password@hostname:port
      *
-     * @return
+     * @return netconf callhome
      */
-    String getIp();
+    String getUrl();
+
+    String getHost();
 
     /**
      * 访问端口
@@ -41,32 +46,17 @@ public interface NetconfDevice  {
      */
     int getPort();
 
+    String getVersion();
 
-    /**
-     * 访问协议
-     *
-     * @return
-     */
-    String getProtocol();
+    String getZoneId();
 
     String getUsername();
 
-    AuthType getAuthType();
-
     String getPassword();
 
-    /**
-     * Key 认证文件路径
-     *
-     * @return
-     */
-    File getKeyPath();
-
-    KeyPair getKeyPair();
-
-    enum AuthType {
-        Password, Key
-    }
     int getConnectTimeout();
 
+//    default NetconfClient getNetconfClient() throws NetconfException {
+//        return null;
+//    }
 }
