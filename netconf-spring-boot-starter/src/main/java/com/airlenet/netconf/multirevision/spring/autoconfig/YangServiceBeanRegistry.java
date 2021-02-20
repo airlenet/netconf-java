@@ -15,6 +15,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Set;
 
 public class YangServiceBeanRegistry implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
     private BeanFactory beanFactory;
@@ -22,7 +23,9 @@ public class YangServiceBeanRegistry implements BeanDefinitionRegistryPostProces
     private String beanName;
     private ApplicationContext applicationContext;
 
-    public YangServiceBeanRegistry() {
+    protected final Set<String> packagesToScan;
+    public YangServiceBeanRegistry(Set<String> packagesToScan) {
+        this.packagesToScan = packagesToScan;
     }
 
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -43,10 +46,11 @@ public class YangServiceBeanRegistry implements BeanDefinitionRegistryPostProces
                 scanner.setResourceLoader(this.resourceLoader);
             }
             List<String> packages = AutoConfigurationPackages.get(this.applicationContext);
+            packagesToScan.addAll(packages);
             scanner.setBeanNameGenerator(new YangServiceNameGenerator());
             scanner.setAnnotationClass(YangService.class);
             scanner.registerFilters();
-            scanner.doScan(StringUtils.toStringArray(packages));
+            scanner.doScan(StringUtils.toStringArray(packagesToScan));
         } catch (IllegalStateException e) {
             throw e;
         }

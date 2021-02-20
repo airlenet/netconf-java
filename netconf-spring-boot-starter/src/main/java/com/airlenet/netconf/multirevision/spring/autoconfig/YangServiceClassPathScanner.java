@@ -35,7 +35,6 @@ public class YangServiceClassPathScanner extends ClassPathBeanDefinitionScanner 
     private YangServiceFactoryBean<?> yangServiceFactoryBean = new YangServiceFactoryBean<Object>();
 
     protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-        //TODO ,YangService 注入
         AnnotationMetadata metadata = beanDefinition.getMetadata();
        return metadata.hasAnnotation(YangService.class.getName());
 //        return metadata.isInterface() && metadata.isIndependent() || metadata.isConcrete();

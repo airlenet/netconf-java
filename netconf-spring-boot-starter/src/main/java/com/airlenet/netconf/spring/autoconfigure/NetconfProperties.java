@@ -1,8 +1,11 @@
 package com.airlenet.netconf.spring.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @ConfigurationProperties(prefix = "spring.netconf")
 public class NetconfProperties {
@@ -24,6 +27,16 @@ public class NetconfProperties {
     private DefaultOperation defaultOperation = DefaultOperation.NOT_SET;
 
     private StatViewServlet statViewServlet = new StatViewServlet();
+    @NestedConfigurationProperty
+    private NetconfProperties.Scan scan = new NetconfProperties.Scan();
+
+    public void setScan(Scan scan) {
+        this.scan = scan;
+    }
+
+    public Scan getScan() {
+        return scan;
+    }
 
     public int getConnectionTimeout() {
         return connectionTimeout;
@@ -182,6 +195,21 @@ public class NetconfProperties {
 
         public void setLoginPassword(String loginPassword) {
             this.loginPassword = loginPassword;
+        }
+    }
+
+    static class Scan {
+        private Set<String> basePackages = new LinkedHashSet();
+
+        Scan() {
+        }
+
+        public Set<String> getBasePackages() {
+            return this.basePackages;
+        }
+
+        public void setBasePackages(Set<String> basePackages) {
+            this.basePackages = basePackages;
         }
     }
 }
