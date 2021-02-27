@@ -11,13 +11,14 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Set;
 
-public class YangServiceBeanRegistry implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
+public class YangServiceBeanRegistry implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware, ResourceLoaderAware {
     private BeanFactory beanFactory;
     private ResourceLoader resourceLoader;
     private String beanName;
