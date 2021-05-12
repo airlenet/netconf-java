@@ -6,6 +6,7 @@ import com.airlenet.netconf.datasource.NetconfPooledConnection;
 import com.tailf.jnc.Capabilities;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
+import com.tailf.jnc.YangNsPackage;
 
 public interface NetconfClient {
 
@@ -13,7 +14,7 @@ public interface NetconfClient {
 
     public NodeSet get(String url, String username, String password, String xpath) throws NetconfException;
 
-    public NodeSet get(NetconfDevice netconfDevice, String xpath) throws NetconfException;
+    public NodeSet get(NetconfDevice netconfDevice, String xpath, YangNsPackage ... yangNsPackages) throws NetconfException;
 
     public NodeSet get(String url, String username, String password, Element subtreeFilter) throws NetconfException;
 

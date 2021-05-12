@@ -32,4 +32,11 @@ public @interface YangMethod {
      * @return
      */
     boolean priority() default false;
+
+    /**
+     * 适配版本号前缀
+     *
+     * @return
+     */
+    String versionRegexp() default "";
 }

@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
-public abstract class NetconfAbstractDataSource {
+public abstract class NetconfAbstractDataSource implements AutoCloseable{
     private static final Logger LOG = Logger.getLogger("NetconfAbstractDataSource");
     protected volatile String username;
     protected volatile String password;

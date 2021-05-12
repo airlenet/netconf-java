@@ -10,14 +10,10 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class YangServiceMapping extends ApplicationObjectSupport implements InitializingBean {
     private final MappingRegistry mappingRegistry = new MappingRegistry();
@@ -43,7 +39,8 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
                             return new YangMethodInfo(yangMethod == null ? new Class[0] : yangMethod.moduleClass(),
                                     yangMethod == null ? false : yangMethod.moduleEnable(),
                                     yangMethod == null ? false : yangMethod.ignore(),
-                                    yangMethod == null ? false : yangMethod.priority());// this.getMappingForMethod(method, userType);
+                                    yangMethod == null ? false : yangMethod.priority(),
+                                    yangMethod == null ? null : yangMethod.versionRegexp());// this.getMappingForMethod(method, userType);
                         } catch (Throwable throwable) {
                             throw new IllegalStateException("Invalid mapping on handler class [" + userType.getName() + "]: " + method, throwable);
                         }
@@ -58,6 +55,11 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
                 }
             }
         }
+        this.mappingRegistry.methodCapabilitiyLookup.entrySet().forEach(stringListEntry -> {
+            stringListEntry.getValue().stream().sorted((o1, o2) -> {
+                return o1.getVersionRegexp() == null ? 1 : o1.getVersionRegexp().compareTo(o2.getVersionRegexp());
+            });
+        });
     }
 
     protected void registerHandlerMethod(Object handler, Method method, YangMethodInfo mapping) {
@@ -65,28 +67,28 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
             this.mappingRegistry.register(mapping, handler, method);
     }
 
-    public YangHandlerMethod getHandler(Method method, YangMethodInfo.YangCapabilityInfo capability) {
+    public YangHandlerMethod getHandler(Method method, YangMethodInfo.YangCapabilityInfo capability, String version) {
         List<YangMethodInfo> yangMethodInfos = this.mappingRegistry.urlLookup.get(getMethodUniStr(method) + (capability == null ? "" : capability.getCapabilityUri()));
         if (yangMethodInfos == null)
             return null;
         for (YangMethodInfo yangMethodInfo : yangMethodInfos) {
-            yangMethodInfo.isPriority();
-            return this.mappingRegistry.mappingLookup.get(yangMethodInfo);
+            YangHandlerMethod yangHandlerMethod = this.mappingRegistry.mappingLookup.get(yangMethodInfo);
+            return yangHandlerMethod;
         }
         return null;
     }
 
     public List<YangMethodInfo.YangCapabilityInfo> getYangCapabilityInfo(Method method) {
-        List<YangMethodInfo.YangCapabilityInfo> yangCapabilityInfos = this.mappingRegistry.methodLookup.get(getMethodUniStr(method));
+        List<YangMethodInfo.YangCapabilityInfo> yangCapabilityInfos = this.mappingRegistry.methodCapabilitiyLookup.get(getMethodUniStr(method));
         return yangCapabilityInfos;
     }
 
     public String getMethodUniStr(Method method) {
         StringBuilder sb = new StringBuilder();
         Class<?> declaringClass = method.getDeclaringClass();
-        if(declaringClass.isInterface()){
+        if (declaringClass.isInterface()) {
             sb.append(declaringClass.getTypeName()).append('.');
-        }else{
+        } else {
             sb.append(declaringClass.getInterfaces()[0].getTypeName()).append('.');
         }
 
@@ -101,20 +103,21 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
     class MappingRegistry {
         private final Map<YangMethodInfo, YangHandlerMethod> mappingLookup = new LinkedHashMap();
         private final MultiValueMap<String, YangMethodInfo> urlLookup = new LinkedMultiValueMap();
-        private final MultiValueMap<String, YangMethodInfo.YangCapabilityInfo> methodLookup = new LinkedMultiValueMap();
+        private final MultiValueMap<String, YangMethodInfo.YangCapabilityInfo> methodCapabilitiyLookup = new LinkedMultiValueMap();
 
         public void register(YangMethodInfo mapping, Object handler, Method method) {
+
             mappingLookup.put(mapping, createHandlerMethod(handler, method));
 
             String methodUniStr = getMethodUniStr(method);
             List<YangMethodInfo.YangCapabilityInfo> yangCapabilities = mapping.getYangCapabilities();
             if (yangCapabilities.isEmpty()) {
                 urlLookup.add(methodUniStr, mapping);
-                methodLookup.addAll(methodUniStr, yangCapabilities);
+                methodCapabilitiyLookup.addAll(methodUniStr, yangCapabilities);
             } else {
                 yangCapabilities.forEach(yangCapabilityInfo -> {
                     urlLookup.add(methodUniStr + yangCapabilityInfo.getCapabilityUri(), mapping);
-                    methodLookup.add(methodUniStr, yangCapabilityInfo);
+                    methodCapabilitiyLookup.add(methodUniStr, yangCapabilityInfo);
 
                 });
             }

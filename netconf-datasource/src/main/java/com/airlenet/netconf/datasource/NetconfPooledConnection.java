@@ -3,6 +3,7 @@ package com.airlenet.netconf.datasource;
 import com.airlenet.netconf.datasource.util.Utils;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
+import com.tailf.jnc.YangNsPackage;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -178,9 +179,9 @@ public class NetconfPooledConnection extends NetconfConnection implements AutoCl
     }
 
     @Override
-    public NodeSet get(String xpath) throws NetconfException {
+    public NodeSet get(String xpath, YangNsPackage... yangNsPackages) throws NetconfException {
         runStackTrace = Utils.toString(Thread.currentThread().getStackTrace());
-        return conn.get(xpath);
+        return conn.get(xpath,yangNsPackages);
     }
 
     @Override

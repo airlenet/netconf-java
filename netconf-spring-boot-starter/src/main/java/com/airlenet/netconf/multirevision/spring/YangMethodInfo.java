@@ -10,19 +10,21 @@ public class YangMethodInfo {
     boolean priority = false;
     Class<?>[] moduleClass;
     boolean moduleEnable;
+    String versionRegexp;
 
-    public YangMethodInfo(Class<?>[] prefixClass, boolean prefixEnable, boolean ignore, boolean priority) throws NoSuchFieldException, IllegalAccessException {
+    public YangMethodInfo(Class<?>[] prefixClass, boolean prefixEnable, boolean ignore, boolean priority,String versionPrefix) throws NoSuchFieldException, IllegalAccessException {
         this.moduleClass = prefixClass;
         this.moduleEnable = prefixEnable;
         this.ignore = ignore;
         this.priority = priority;
+        this.versionRegexp= versionPrefix;
         yangCapabilityInfo = new ArrayList<>();
         for (Class<?> clazz : prefixClass) {
             Object revision = clazz.getDeclaredField("REVISION").get(null);
             Object namespace = clazz.getDeclaredField("NAMESPACE").get(null);
             Object moduleName = clazz.getDeclaredField("MODULE_NAME").get(null);
             yangCapabilityInfo.add(new YangCapabilityInfo(namespace.toString(),
-                    moduleName == null ? null : moduleName.toString(), revision == null ? null : revision.toString()))
+                    moduleName == null ? null : moduleName.toString(), revision == null ? null : revision.toString(),versionPrefix))
             ;
         }
     }
@@ -51,7 +53,7 @@ public class YangMethodInfo {
         private String namespace;
         private String revision;
         private String module;
-
+        private String versionRegexp;
         public String getCapabilityUri() {
             return namespace + ":" + module + ":" + revision;
         }
@@ -69,15 +71,20 @@ public class YangMethodInfo {
             return revision;
         }
 
+        public String getVersionRegexp() {
+            return versionRegexp;
+        }
+
         public void setRevision(String revision) {
             this.revision = revision;
         }
 
 
-        public YangCapabilityInfo(String namespace, String module, String revision) {
+        public YangCapabilityInfo(String namespace, String module, String revision,String versionPrefix) {
             this.namespace = namespace;
             this.module = module;
             this.revision = revision;
+            this.versionRegexp = versionPrefix;
         }
     }
 }

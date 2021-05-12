@@ -7,6 +7,7 @@ import com.airlenet.netconf.datasource.NetconfPooledConnection;
 import com.tailf.jnc.Capabilities;
 import com.tailf.jnc.Element;
 import com.tailf.jnc.NodeSet;
+import com.tailf.jnc.YangNsPackage;
 
 public class DefaultNetconfClient implements NetconfClient {
 
@@ -31,10 +32,10 @@ public class DefaultNetconfClient implements NetconfClient {
     }
 
     @Override
-    public NodeSet get(NetconfDevice netconfDevice, String xpath) throws NetconfException {
+    public NodeSet get(NetconfDevice netconfDevice, String xpath, YangNsPackage ... yangNsPackages) throws NetconfException {
         try (NetconfPooledConnection connection = multiNetconfDataSource.getConnection(netconfDevice.getUrl(), netconfDevice.getUsername(), netconfDevice.getPassword())) {
             connection.updateZoneId(netconfDevice.getZoneId());
-            return connection.get(xpath);
+            return connection.get(xpath,yangNsPackages);
         }
     }
 

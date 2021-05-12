@@ -206,9 +206,9 @@ public class NetconfConnection {
         }
     }
 
-    public NodeSet get(String xpath) throws NetconfException {
+    public NodeSet get(String xpath, YangNsPackage ... yangNsPackages) throws NetconfException {
         try {
-            return netconfSession.get(xpath);
+            return netconfSession.get(xpath,yangNsPackages);
         } catch (Exception e) {
             throw getCauseException(e);
         }
