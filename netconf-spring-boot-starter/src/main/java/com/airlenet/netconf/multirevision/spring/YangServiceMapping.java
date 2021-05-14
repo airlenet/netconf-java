@@ -14,6 +14,7 @@ import org.springframework.util.MultiValueMap;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class YangServiceMapping extends ApplicationObjectSupport implements InitializingBean {
     private final MappingRegistry mappingRegistry = new MappingRegistry();
@@ -56,9 +57,9 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
             }
         }
         this.mappingRegistry.methodCapabilitiyLookup.entrySet().forEach(stringListEntry -> {
-            stringListEntry.getValue().stream().sorted((o1, o2) -> {
-                return o1.getVersionRegexp() == null ? 1 : o1.getVersionRegexp().compareTo(o2.getVersionRegexp());
-            });
+            stringListEntry.setValue(stringListEntry.getValue().stream().sorted((o1, o2) -> {
+                return o1.getVersionRegexp() == null ? 1 : o2.getVersionRegexp().compareTo(o1.getVersionRegexp());
+            }).collect(Collectors.toList()));
         });
     }
 
@@ -67,17 +68,10 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
             this.mappingRegistry.register(mapping, handler, method);
     }
 
-    public YangHandlerMethod getHandler(Method method, YangMethodInfo.YangCapabilityInfo capability, String version) {
-        List<YangMethodInfo> yangMethodInfos = this.mappingRegistry.urlLookup.get(getMethodUniStr(method) + (capability == null ? "" : capability.getCapabilityUri()));
-        if (yangMethodInfos == null)
-            return null;
-        for (YangMethodInfo yangMethodInfo : yangMethodInfos) {
-            YangHandlerMethod yangHandlerMethod = this.mappingRegistry.mappingLookup.get(yangMethodInfo);
-            return yangHandlerMethod;
-        }
-        return null;
+    public YangHandlerMethod getHandler(Method method, YangMethodInfo yangMethodInfo) {
+        YangHandlerMethod yangHandlerMethod = this.mappingRegistry.mappingLookup.get(yangMethodInfo);
+        return yangHandlerMethod;
     }
-
     public List<YangMethodInfo.YangCapabilityInfo> getYangCapabilityInfo(Method method) {
         List<YangMethodInfo.YangCapabilityInfo> yangCapabilityInfos = this.mappingRegistry.methodCapabilitiyLookup.get(getMethodUniStr(method));
         return yangCapabilityInfos;
@@ -99,6 +93,7 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
         }
         return sb.toString();
     }
+
 
     class MappingRegistry {
         private final Map<YangMethodInfo, YangHandlerMethod> mappingLookup = new LinkedHashMap();

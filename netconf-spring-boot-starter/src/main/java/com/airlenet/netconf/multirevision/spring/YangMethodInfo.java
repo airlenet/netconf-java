@@ -24,7 +24,7 @@ public class YangMethodInfo {
             Object namespace = clazz.getDeclaredField("NAMESPACE").get(null);
             Object moduleName = clazz.getDeclaredField("MODULE_NAME").get(null);
             yangCapabilityInfo.add(new YangCapabilityInfo(namespace.toString(),
-                    moduleName == null ? null : moduleName.toString(), revision == null ? null : revision.toString(),versionPrefix))
+                    moduleName == null ? null : moduleName.toString(), revision == null ? null : revision.toString(),versionPrefix,this))
             ;
         }
     }
@@ -54,6 +54,7 @@ public class YangMethodInfo {
         private String revision;
         private String module;
         private String versionRegexp;
+        private YangMethodInfo yangMethodInfo;
         public String getCapabilityUri() {
             return namespace + ":" + module + ":" + revision;
         }
@@ -71,6 +72,10 @@ public class YangMethodInfo {
             return revision;
         }
 
+        public YangMethodInfo getYangMethodInfo() {
+            return yangMethodInfo;
+        }
+
         public String getVersionRegexp() {
             return versionRegexp;
         }
@@ -80,11 +85,12 @@ public class YangMethodInfo {
         }
 
 
-        public YangCapabilityInfo(String namespace, String module, String revision,String versionPrefix) {
+        public YangCapabilityInfo(String namespace, String module, String revision,String versionPrefix,YangMethodInfo yangMethodInfo) {
             this.namespace = namespace;
             this.module = module;
             this.revision = revision;
             this.versionRegexp = versionPrefix;
+            this.yangMethodInfo = yangMethodInfo;
         }
     }
 }
