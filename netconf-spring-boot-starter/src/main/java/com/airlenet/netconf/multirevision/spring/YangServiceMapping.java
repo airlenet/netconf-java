@@ -58,7 +58,7 @@ public class YangServiceMapping extends ApplicationObjectSupport implements Init
         }
         this.mappingRegistry.methodCapabilitiyLookup.entrySet().forEach(stringListEntry -> {
             stringListEntry.setValue(stringListEntry.getValue().stream().sorted((o1, o2) -> {
-                return o1.getVersionRegexp() == null ? 1 : o2.getVersionRegexp().compareTo(o1.getVersionRegexp());
+                return  o1.getVersionRegexp() == null ? 1 : o2.getVersionRegexp().compareTo(o1.getVersionRegexp());
             }).collect(Collectors.toList()));
         });
     }

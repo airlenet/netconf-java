@@ -4,6 +4,8 @@ import com.airlenet.netconf.datasource.NetconfDevice;
 import com.airlenet.netconf.datasource.NetconfException;
 import com.airlenet.netconf.spring.NetconfClient;
 import com.tailf.jnc.Capabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 
@@ -19,6 +21,7 @@ public class YangServiceProxy<T> implements InvocationHandler, Serializable {
     private final Class<T> yangServiceInterface;
     private YangServiceMapping yangServiceMapping;
     private NetconfClient netconfClient;
+    private static final Logger logger = LoggerFactory.getLogger(YangServiceProxy.class);
 
     public YangServiceProxy(Class<T> yangServiceInterface) {
         this.yangServiceInterface = yangServiceInterface;
@@ -31,9 +34,15 @@ public class YangServiceProxy<T> implements InvocationHandler, Serializable {
         List<YangMethodInfo.YangCapabilityInfo> yangCapabilityInfoList = yangServiceMapping.getYangCapabilityInfo(method);
         String version = (String) netconfDevice.getExtraInfo("version");
         Capabilities capabilities = netconfClient.getCapabilities(netconfDevice);
-
+        YangMethodInfo.YangCapabilityInfo firstYangCapabilityInfo = null;
         for (YangMethodInfo.YangCapabilityInfo yangCapabilityInfo : yangCapabilityInfoList) {
+            if (firstYangCapabilityInfo == null) {
+                firstYangCapabilityInfo = yangCapabilityInfo;
+            }
             Capabilities.Capa curCapa = capabilities.getCapaByUri(yangCapabilityInfo.getNamespace());
+            if (curCapa == null) {
+                continue;
+            }
             if (Objects.equals(yangCapabilityInfo.getModule(), curCapa.getModule())
                     && Objects.equals(yangCapabilityInfo.getRevision(), curCapa.getRevision())) {
                 if (StringUtils.hasText(version)
@@ -49,6 +58,10 @@ public class YangServiceProxy<T> implements InvocationHandler, Serializable {
                     break;
                 }
             }
+        }
+        if (capabilityInfo == null) {
+            capabilityInfo = firstYangCapabilityInfo;
+            logger.warn("Invoker priority @YangMethod {}", method.toString());
         }
 
         if (!yangCapabilityInfoList.isEmpty() && capabilityInfo == null) {
